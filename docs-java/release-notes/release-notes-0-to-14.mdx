@@ -1,0 +1,176 @@
+## 4.3.0 - December 1, 2022
+
+[Maven Central](https://search.maven.org/search?q=g:com.sap.cloud.sdk*%20AND%20v:4.3.0)
+
+### New Functionality
+
+- Introduce new APIs to configure the destination cache in the `ScpCfDestinationLoader`.
+
+  **We strongly recommend using the following APIs before loading any destination, for example, during application startup _only_**:
+
+  - `ScpCfDestinationLoader.Cache.setSizeLimit`: Set the number of cache entries that will be cached.
+  - `ScpCfDestinationLoader.Cache.disableSizeLimit`: Disable the cache size limit. The cache will store an infinite amount of entries - **use with caution**.
+  - `ScpCfDestinationLoader.Cache.setExpiration`: Set the expiration duration and strategy for cache entries.
+  - `ScpCfDestinationLoader.Cache.disableExpiration`: Disable the cache entry expiration. The cache will store entries until it is full, which will lead to the deletion of old entries. This might cause destinations to be cached forever - **use with caution**.
+  - `ScpCfDestinationLoader.Cache.disable`: Disable the entire cache. All destination will always be retrieved from the Destination Service. This will result in performance degradations - **use with caution**.
+
+- Add a list of default destination property keys (in the `DestinationProperty` class), which allow convenient and type-safe access to specific values of `DestinationProperties`.
+
+  Example:
+
+```java
+Destination destination = DestinationAccessor.getDestination("my-destination");
+AuthenticationType authType = destination.get(DestinationProperty.AUTH_TYPE)
+        .orElse(() -> destination.get(DestinationProperty.AUTH_TYPE_FALLBACK))
+        .getOrNull();
+```
+
+### Improvements
+
+<!-- vale off -->
+
+- Dependency Updates:
+  - SAP dependency updates:
+    - Update [SAP Cloud Security Library](https://github.com/SAP/cloud-security-xsuaa-integration) from `2.13.2` to `2.13.4`
+    - Update [SAP Java Buildpack](https://central.sonatype.dev/artifact/com.sap.cloud.sjb.cf/cf-tomcat-bom/1.63.0/versions) from `1.60.0` to `1.63.0`
+  - Other dependency updates: - Update [Spring Core and Web](<https://search.maven.org/search?q=g:org.springframework%20AND%20(a:spring-core%20OR%20a:spring-web)>) from `5.3.23` to `5.3.24`
+  <!-- vale on -->
+
+### Fixed Issues
+
+- Fix GSON deserialization issue during destination lookup for JRE16 and later.
+- Fix an issue in our `resilience4j` cache implementation, where a race condition might lead to multiple executions of the wrapped `Callable`.
+
+## 4.2.0 - November 17, 2022
+
+[Maven Central](https://search.maven.org/search?q=g:com.sap.cloud.sdk*%20AND%20v:4.2.0)
+
+### Improvements
+
+- The circuit breaker now always applies the failure rate threshold when the closed / half-open buffer is filled.
+  - Previously, if a buffer size > 100 was configured, the circuit breaker would already apply the failure rate after 100 attempts.
+  - Now, the circuit breaker will always apply the threshold after `<buffer size>` amount of attempts (default 10 in closed and 5 in half-open state)
+
+<!-- vale off -->
+
+- Dependency Updates:
+  - Minor version updates:
+    - Update [Gson](https://search.maven.org/search?q=g:com.google.code.gson%2BAND%2Ba:gson) (`com.google.code.gson:gson`) from `2.9.0` to `2.10.0`
+    - Update `com.fasterxml.jackson` from `2.13.4` to `2.14.0`
+    - Update `com.auth0:java-jwt` from `4.0.0` to `4.2.1`
+    - Update [Spring](https://search.maven.org/search?q=g:org.springframework%2BAND%2Ba:spring-framework-bom) (`org.springframework:spring-framework-bom`) from `5.3.22` to `5.3.23`
+    - Update [Spring Boot](https://search.maven.org/search?q=g:org.springframework.boot%2BAND%2Ba:spring-boot-starter-reactor-netty) (`org.springframework.boot:spring-boot-starter-reactor-netty`) from `2.7.3` to `2.7.5`
+
+<!-- vale on -->
+
+### Known Issues
+
+- When using JRE 16 or later, then GSON deserialization fails during destination lookup.
+
+## 4.1.0 - November 03, 2022
+
+[Maven Central](https://search.maven.org/search?q=g:com.sap.cloud.sdk*%20AND%20v:4.1.0)
+
+### New Functionality
+
+- Update of the OData VDM to the [newest release 2022 FPS0 of SAP S/4HANA On-Premise](https://help.sap.com/viewer/product/SAP_S4HANA_ON-PREMISE/2022/en-US).
+  The SAP Cloud SDK supports all OData services listed in the [SAP API Business Hub for SAP S/4HANA On-Premise](https://api.sap.com/products/SAPS4HANA/overview).
+  This includes completely new services, new operations in previously existing services, and new entity types in the existing Maven artifacts:
+  - [`s4hana-api-odata-v4-onpremise`](https://search.maven.org/artifact/com.sap.cloud.sdk.s4hana/s4hana-api-odata-v4-onpremise) manages classes in package `com.sap.cloud.sdk.s4hana.onpremise.datamodel.odatav4.services`
+  - [`s4hana-api-odata-onpremise`](https://search.maven.org/artifact/com.sap.cloud.sdk.s4hana/s4hana-api-odata-onpremise) manages classes in package `com.sap.cloud.sdk.s4hana.onpremise.datamodel.odata.services`
+
+### Improvements
+
+<!-- vale off -->
+
+- Dependency Updates:
+  - SAP dependency updates:
+    - Update [SAP Service Binding Library](https://github.com/SAP/btp-environment-variable-access) from `0.5.0` to `0.5.1`
+  - Other dependency updates:
+    - Minor version updates:
+      - Update [Checker Equal](https://search.maven.org/search?q=g:org.checkerframework%20AND%20a:checker-qual) (`org.checkerframework:checker-equal`) from `3.25.0` to `3.26.0`
+
+<!-- vale on -->
+
+### Fixed Issues
+
+- Fix an issue when using the latest version of the [SAP BTP Service Operator](https://github.com/SAP/sap-btp-service-operator/) with default parameters in Kubernetes environments.
+
+## 4.0.0 - October 12, 2022
+
+[Maven Central](https://search.maven.org/search?q=g:com.sap.cloud.sdk*%20AND%20v:4.0.0)
+
+### Improvements
+
+This is the first release of the SAP Cloud SDK version 4.
+As this is a new major version, this release contains a lot of (under the hood) improvements, refactoring, and other changes.
+Please refer to the [Upgrade Guide](../guides/4.0-upgrade.mdx) for details instructions on how to upgrade your SAP Cloud SDK dependencies to our new major version and for a detailed list of changes.
+
+### Compatibility Notes
+
+- We are aware of the vulnerability [CVE-2022-42003](https://nvd.nist.gov/vuln/detail/CVE-2022-42003), which affects a version of `jackson-databind` that is shipped as part of the `sdk-bom`.
+  After careful investigation we found that the described exploit **does not** affect the SAP Cloud SDK.
+  Nevertheless, customers should be aware of this vulnerability and check their code.
+
+  We will update the affected dependency as soon as a production ready fix is available.
+
+### Known Issues
+
+- We are aware of a version conflict of the `com.sap.cloud.environment.servicebinding:*` dependencies when the SAP Cloud SDK is used in combination with CAP ([`cds-integration-cloud-sdk`](https://search.maven.org/search?q=g:com.sap.cds%20AND%20a:cds-integration-cloud-sdk)).
+  This conflict can be resolved by including following dependency in the `<dependencyManagement>` section of your project:
+
+  ```xml
+  <!-- Service Binding Library -->
+  <dependency>
+    <groupId>com.sap.cloud.environment.servicebinding</groupId>
+    <artifactId>java-modules-bom</artifactId>
+    <version>0.5.0</version>
+    <type>pom</type>
+    <scope>import</scope>
+  </dependency>
+  ```
+
+<details>
+
+{' '}
+
+<summary>
+  Resulting <code>pom.xml</code>
+</summary>
+
+```xml
+<dependencyManagement>
+    <dependencies>
+
+        <!-- CDS SERVICES -->
+        <dependency>
+            <groupId>com.sap.cds</groupId>
+            <artifactId>cds-services-bom</artifactId>
+            <version>${cds.services.version}</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+
+        <!-- Cloud SDK -->
+        <dependency>
+            <groupId>com.sap.cloud.sdk</groupId>
+            <artifactId>sdk-modules-bom</artifactId>
+            <version>4.0.0</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+
+        <!-- Service Binding Library -->
+        <dependency>
+            <groupId>com.sap.cloud.environment.servicebinding</groupId>
+            <artifactId>java-modules-bom</artifactId>
+            <version>0.5.0</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+
+    </dependencies>
+</dependencyManagement>
+```
+
+</details>
